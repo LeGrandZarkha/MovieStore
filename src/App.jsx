@@ -29,7 +29,54 @@ function App() {
     getMoviesGenres()
   }, [])
 
+  const CACHE_KEY = 'moviesGenreCache'
+  const weekInMs = 7 * 24 * 60 * 60 * 1000
+
+
+  const setGenresCache = (genres) => {
+    const payload = {
+      data: genres,
+      fetchedAt: Date.now()
+    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(payload))
+  }
+
+
+  const getGenresCache = () => {
+
+    const rawCache = localStorage.getItem(CACHE_KEY)
+
+    if (rawCache === null) {
+      return null
+    }
+
+    try {
+      const parsedCache = JSON.parse(rawCache)
+      const isExpired = Date.now() > parsedCache.fetchedAt + weekInMs
+
+      if (!parsedCache.data || !parsedCache.fetchedAt) {
+        return null
+      }
+
+      if (isExpired) {
+        return null
+      }
+
+      return parsedCache.data
+    } catch (error) {
+      return null
+    }
+  }
+
   const getMoviesGenres = async () => {
+
+    const cachedGenres = getGenresCache()
+
+    if (cachedGenres !== null) {
+      setMoviesGenre(cachedGenres)
+      setFetchGenresStatus('success')
+      return
+    }
 
     const options = {
       method: 'GET',
@@ -48,6 +95,7 @@ function App() {
       const result = await response.json()
       setMoviesGenre(result.genres)
       setFetchGenresStatus('success')
+      setGenresCache(result.genres)
     } catch (error) {
       console.log(error)
       setFetchGenresStatus('error')
@@ -59,6 +107,7 @@ function App() {
       genreIds.map(element => moviesGenre.find(genre => genre?.id === element)?.name)
     )
   }
+
 
   function normalizeTitle(str) {
     return str.replace(/[^\w\s]/g, '').replace(/\s{2,}/g, ' ').trim()
