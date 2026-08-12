@@ -3,6 +3,7 @@
 ## État actuel
 
 Catalogue fonctionnel avec deux stratégies de fetch selon le contexte : `/discover/movie` pour un filtrage par genre/note, `/search/movie` + filtrage local pour une recherche par titre. Débounce branché sur les requêtes réseau et l'affichage, notamment pour le curseur de note. Gestion loading/error sur les deux fetchs (films et genres). Repo versionné sur GitHub à partir de ce point.
+Les genres sont mis en cache dans localStorage (expiration à une semaine) pour éviter un refetch à chaque montage. Repo versionné sur GitHub à partir de ce point.
 
 ## Points ouverts
 
@@ -15,11 +16,10 @@ Catalogue fonctionnel avec deux stratégies de fetch selon le contexte : `/disco
 
 ## Prochaines étapes
 
-1. Cache localStorage pour données quasi-statiques (`moviesGenre`, config images TMDB) — vérifier cache + timestamp d'expiration avant fetch
-2. Authentification Supabase
-3. Restructurer la table Supabase (`tmdb_id` + colonnes perso uniquement : favoris, vu, note, `user_id`)
-4. Page favoris + bouton favoris au hover (V2)
-5. Migrations Supabase versionnées en Git
+1. Authentification Supabase
+2. Restructurer la table Supabase (`tmdb_id` + colonnes perso uniquement : favoris, vu, note, `user_id`)
+3. Page favoris + bouton favoris au hover (V2)
+4. Migrations Supabase versionnées en Git
 
 ## Pistes explorées, écartées ou reportées consciemment
 
