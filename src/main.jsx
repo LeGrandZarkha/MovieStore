@@ -1,10 +1,25 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router";
+
 import './index.css'
 import App from './App.jsx'
+import Favorites from './components/Favorites.jsx'
+import Layout from './components/Layout.jsx';
+import AuthCallback from './components/AuthCallback.jsx';
 
-createRoot(document.getElementById('root')).render(
+const root = document.getElementById("root");
+
+ReactDOM.createRoot(root).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path='/' element={<App />}></Route>
+          <Route path='/favorites' element={<Favorites />}></Route>
+          <Route path='/AuthCallback' element={<AuthCallback />}></Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </StrictMode>
 )
