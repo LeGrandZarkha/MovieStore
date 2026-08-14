@@ -11,7 +11,7 @@ const initialFilters = {
   adult: false
 }
 
-function App() {
+function Discovery() {
 
   const [movies, setMovies] = useState([])
 
@@ -329,4 +329,4 @@ function App() {
   )
 }
 
-export default App
+export default Discovery
