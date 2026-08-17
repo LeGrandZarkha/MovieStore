@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
-import './App.css'
+import { useContext, useEffect, useRef, useState } from 'react'
+import '../App.css'
 
-import MovieCard from './components/MovieCard'
-import FilterMoviesForm from './components/FilterMoviesForm'
+import MovieCard from '../components/MovieCard'
+import FilterMoviesForm from '../components/FilterMoviesForm'
+
+import { GENRES_CACHE_KEY, WEEK_IN_MS, FAVORITES_CACHE_KEY } from '../constants'
+import { getGenresCache, setGenresCache } from '../utils/cache'
+import { GenresContext } from '../context/GenresContext'
 
 const initialFilters = {
   title: '',
@@ -13,100 +17,15 @@ const initialFilters = {
 
 function Discovery() {
 
+  const { fetchGenresStatus, moviesGenre } = useContext(GenresContext)
+
   const [movies, setMovies] = useState([])
 
   const [filters, setFilters] = useState(initialFilters)
 
   const [fetchMoviesStatus, setFetchMoviesStatus] = useState('')
 
-  const [fetchGenresStatus, setFetchGenresStatus] = useState('')
-
   const [totalPages, setTotalPages] = useState(null)
-
-  const [moviesGenre, setMoviesGenre] = useState([])
-
-  useEffect(() => {
-    getMoviesGenres()
-  }, [])
-
-  const CACHE_KEY = 'moviesGenreCache'
-  const weekInMs = 7 * 24 * 60 * 60 * 1000
-
-
-  const setGenresCache = (genres) => {
-    const payload = {
-      data: genres,
-      fetchedAt: Date.now()
-    }
-    localStorage.setItem(CACHE_KEY, JSON.stringify(payload))
-  }
-
-
-  const getGenresCache = () => {
-
-    const rawCache = localStorage.getItem(CACHE_KEY)
-
-    if (rawCache === null) {
-      return null
-    }
-
-    try {
-      const parsedCache = JSON.parse(rawCache)
-      const isExpired = Date.now() > parsedCache.fetchedAt + weekInMs
-
-      if (!parsedCache.data || !parsedCache.fetchedAt) {
-        return null
-      }
-
-      if (isExpired) {
-        return null
-      }
-
-      return parsedCache.data
-    } catch (error) {
-      return null
-    }
-  }
-
-  const getMoviesGenres = async () => {
-
-    const cachedGenres = getGenresCache()
-
-    if (cachedGenres !== null) {
-      setMoviesGenre(cachedGenres)
-      setFetchGenresStatus('success')
-      return
-    }
-
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: 'Bearer ' + import.meta.env.VITE_TMDB_TOKEN
-      }
-    };
-
-    try {
-      const response = await fetch('https://api.themoviedb.org/3/genre/movie/list?language=en', options)
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      setMoviesGenre(result.genres)
-      setFetchGenresStatus('success')
-      setGenresCache(result.genres)
-    } catch (error) {
-      console.log(error)
-      setFetchGenresStatus('error')
-    }
-  }
-
-  const getMovieGenresById = (genreIds) => {
-    return (
-      genreIds.map(element => moviesGenre.find(genre => genre?.id === element)?.name)
-    )
-  }
 
 
   function normalizeTitle(str) {
@@ -289,7 +208,7 @@ function Discovery() {
     content = (
       <>
         {filteredMovies.map(movie => (
-          <MovieCard key={movie.id} movie={movie} getMovieGenresById={getMovieGenresById} fetchGenresStatus={fetchGenresStatus} />
+          <MovieCard key={movie.id} movie={movie} />
         ))}
       </>
     );
