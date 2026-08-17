@@ -1,7 +1,16 @@
 import { FaStar } from 'react-icons/fa'
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { IMAGE_BASE_URL, POSTER_SIZE } from '../constants';
+import { FavoritesContext } from '../context/FavoritesContext';
+import { useContext } from 'react';
+import { getMovieGenresById } from '../utils/genres';
+import { GenresContext, GenresProvider } from '../context/GenresContext';
 
-export default function MovieCard({ movie, getMovieGenresById, fetchGenresStatus }) {
+export default function MovieCard({ movie }) {
+
+    const { isFavorite, toggleFavorite } = useContext(FavoritesContext)
+
+    const { fetchGenresStatus } = useContext(GenresContext)
 
     const convertRatingToStars = (rating) => {
         const scale5Rating = rating / 2
@@ -34,6 +43,13 @@ export default function MovieCard({ movie, getMovieGenresById, fetchGenresStatus
             </div>
             <div className='card-wrapper absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity'>
                 <div className='absolute inset-0 bg-black/70 z-0'></div>
+
+                <div className='absolute right-6 top-6 opacity-100 w-5 h-5 z-15' onClick={() => toggleFavorite(movie)}>
+                    {isFavorite(movie.id) ?
+                        (<FaHeart className='text-red-500 w-full h-full' />)
+                        :
+                        (<FaRegHeart className='text-white w-full h-full' />)}
+                </div>
                 <div className="movie-infos absolute bottom-0 inset-x-0 text-white p-3">
                     <div className="absolute bottom-0 left-0 right-0 h-full pointer-events-none z-0" />
                     <header className='relative z-10'>
